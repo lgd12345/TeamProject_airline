@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airline.a1.mypage.MypageMapper">
+	<select id="getBookingList"
+		parameterType="com.airline.a1.checkIn.ETicketVO"
+		resultType="com.airline.a1.checkIn.ETicketVO">
+		select distinct
+		flightTime,kind,bookingNum,resDate,depfnum,arrfnum,depAirportNm,arrAirportNm
+		from bookingTicket join flightData on bookingTicket.depFnum =
+		flightData.fnum where id=#{id} order by resDate desc;
+	</select>
+	<select id="getBookingMore"
+		parameterType="com.airline.a1.checkIn.ETicketVO"
+		resultType="com.airline.a1.checkIn.ETicketVO">
+		<!-- 아래 주석은 운임 정보 있는 것 -->
+		select
+		fnum,bookingTicket.bookingNum,kind,flightBNum,name,bookingTicket.id,depAirportNm,vihicleId,arrAirportNm,depPlandTime,arrPlandTime,totalPrice
+		from flightData join bookingTicket on bookingTicket.depFnum =
+		flightData.fnum join bookingPrice on bookingPrice.bnum =
+		bookingTicket.bnum where bookingTicket.bookingNum = #{bookingNum};
+		<!-- select bnum,fnum,bookingNum,kind,flightBNum,name,id,depAirportNm,vihicleId,arrAirportNm,depPlandTime,arrPlandTime 
+			from flightData join bookingTicket on bookingTicket.depFnum = flightData.fnum 
+			where bookingNum = #{bookingNum} order by depPlandTime asc; -->
+	</select>
+	<select id="getBookingMoreSeat"
+		parameterType="com.airline.a1.checkIn.ETicketVO"
+		resultType="com.airline.a1.checkIn.SeatVO">
+		select * from seat where bookingNum = #{bookingNum};
+	</select>
+	<delete id="bookCancel" parameterType="java.lang.String">
+		delete from bookingTicket
+		where bnum = #{bnum}
+	</delete>
+
+	<!-- 마일리지 -->
+	<select id="mtotal"
+		parameterType="com.airline.a1.member.MembersVO"
+		resultType="com.airline.a1.booking.BookingPriceVO">
+		<!-- select distinct A.bookingNum, B.mileagePlus, C.mileageMin from (select 
+			bookingNum, bnum from bookingPrice where id=#{id} order by bnum desc) A left 
+			outer join (select bookingNum, sum(mileagePlus) mileagePlus from bookingPrice 
+			where id=#{id} group by bookingNum) B on A.bookingNum = B.bookingNum left 
+			outer join (select distinct bookingNum, ifnull(mileageMin,0) mileageMin from 
+			bookingPrice where id=#{id}) C on B.bookingNum = C.bookingNum -->
+		<!-- select distinct A.bookingNum from (select bookingNum, bnum from bookingTicket 
+			where id=#{id} order by bnum desc) A -->
+
+		select distinct bookingNum, mileagePlus, mileageMin, resDate as
+		couName
+		from (select distinct Q.resDate, Z.* from
+		(select distinct
+		A.bookingNum, B.mileagePlus, C.mileageMin, A.bnum from
+		(select bookingNum, bnum from bookingPrice where id=#{id} order by bnum desc)
+		A
+		left outer join
+		(select bookingNum, sum(mileagePlus) mileagePlus from bookingPrice where
+		id=#{id} group by bookingNum) B
+		on A.bookingNum = B.bookingNum
+		left outer join
+		(select distinct bookingNum, ifnull(mileageMin,0) mileageMin from
+		bookingPrice where id=#{id}) C
+		on B.bookingNum = C.bookingNum) Z
+		left outer join bookingTicket Q
+		on Z.bookingNum = Q.bookingNum
+		order by Z.bnum desc) F;
+	</select>
+	<select id="recentMileage"
+		parameterType="com.airline.a1.member.MembersVO"
+		resultType="com.airline.a1.booking.BookingPriceVO">
+		select distinct bookingNum, mileagePlus, mileageMin,
+		resDate as couName
+		from (select distinct Q.resDate, Z.* from
+		(select
+		distinct A.bookingNum, B.mileagePlus, C.mileageMin, A.bnum from
+		(select bookingNum, bnum from bookingPrice where id=#{id} order by
+		bnum desc) A
+		left outer join
+		(select bookingNum, sum(mileagePlus) mileagePlus from bookingPrice where
+		id=#{id} group by bookingNum) B
+		on A.bookingNum = B.bookingNum
+		left outer join
+		(select distinct bookingNum, ifnull(mileageMin,0) mileageMin from
+		bookingPrice where id=#{id}) C
+		on B.bookingNum = C.bookingNum) Z
+		left outer join bookingTicket Q
+		on Z.bookingNum = Q.bookingNum
+		order by Z.bnum desc) F limit 6;
+	</select>
+	<update id="updateMember"
+		parameterType="com.airline.a1.member.MembersVO">
+		update members set
+		name=#{name},phone=#{phone},email=#{email} where id = #{id};
+	</update>
+
+
+	<select id="bnumSearch"
+		parameterType="com.airline.a1.booking.BookingTicketVO"
+		resultType="com.airline.a1.booking.BookingTicketVO">
+		select distinct memberNum from bookingTicket where bookingNum =
+		#{bookingNum}
+	</select>
+
+	<!-- 검색 -->
+	<sql id="bs">
+		<choose>
+			<when test="kind == 'ka'">
+				where title like concat('%',#{search},'%')
+				or textContents like concat('%',#{search},'%')
+			</when>
+			<when test="kind == 'kt'">
+				where title like concat('%',#{search},'%')
+			</when>
+			<!-- <when test="kind == 'kc'"> where contents like concat('%',#{search},'%') 
+				</when> -->
+			<when test="kind == 'ku'">
+				where writer like concat('%',#{search},'%')
+			</when>
+			<otherwise>
+				where textContents like concat('%', #{search},'%')
+			</otherwise>
+		</choose>
+	</sql>
+
+	<resultMap type="com.airline.a1.board2.Notice2VO"
+		id="selectResult">
+		<id column="num" property="num" />
+		<result column="cate" property="cate" />
+		<result column="title" property="title" />
+		<result column="writer" property="writer" />
+		<result column="contents" property="contents" />
+		<result column="textContents" property="textContents" />
+		<result column="regDate" property="regDate" />
+		<result column="hit" property="hit" />
+		<result column="fix" property="fix" />
+		<collection property="notice2Files"
+			javaType="java.util.ArrayList"
+			ofType="com.airline.a1.board2.Notice2FilesVO">
+			<id column="fnum" property="fnum" />
+			<result column="num" property="num" />
+			<result column="fname" property="fname" />
+			<result column="oname" property="oname" />
+		</collection>
+	</resultMap>
+
+	<!-- noticeList -->
+	<select id="notice44List"
+		resultType="com.airline.a1.board2.Notice2VO" parameterType="hashMap">
+		select *
+		from (select
+		@ROWNUM := @ROWNUM + 1 AS ROWNUM,
+		N.*
+		from board_r N,
+		(select @ROWNUM :=#{page.startRow}) R
+		order by fix desc, num desc) K
+		where writer = #{id}
+		limit #{page.startRow},10
+	</select>
+	
+	<!-- 실패한 noticeList -->
+	<select id="notice22List"
+		resultType="com.airline.a1.board2.Notice2VO"
+		parameterType="com.airline.a1.board2Util.Pager2">
+		select *
+		from (select
+		@ROWNUM := @ROWNUM + 1 AS ROWNUM,
+		N.*
+		from board_r N,
+		(select @ROWNUM :=#{startRow}) R
+		<include refid="bs"></include>
+		order by fix desc, num desc) K
+		limit #{startRow},10 where writer = #{writer};
+	</select>
+	
+	<select id="notice22Count" resultType="java.lang.Integer"
+		parameterType="com.airline.a1.board2Util.Pager2">
+		select count(ifnull(num,0)) from board_r
+		<include refid="bs"></include>
+	</select>
+	
+	<update id="notice22Hit">
+		update board_r set hit = hit+1 where num=#{num}
+	</update>
+	
+	<!-- noticeSelect -->
+	<select id="notice22Select" resultMap="selectResult"
+		parameterType="com.airline.a1.board2.Notice2VO">
+		select N.*, F.* from board_r N
+		left join board_r_Files F on N.num = F.num
+		where N.num = #{num}
+		union
+
+		select N.*, F.* from board_r N
+		right join board_r_Files F on N.num = F.num
+		where N.num = #{num}
+	</select>
+	
+	<!-- 이전글, 다음글 -->
+	<select id="prev22" resultType="com.airline.a1.board2.Notice2VO"
+		parameterType="com.airline.a1.board2.Notice2VO">
+					<![CDATA[select title,num from board_r where num < #{num} order by num desc limit 1]]>
+	</select>
+
+	<select id="next22" resultType="com.airline.a1.board2.Notice2VO"
+		parameterType="com.airline.a1.board2.Notice2VO">
+					<![CDATA[select title,num from board_r where num > #{num} order by num asc limit 1]]>
+	</select>
+
+</mapper>

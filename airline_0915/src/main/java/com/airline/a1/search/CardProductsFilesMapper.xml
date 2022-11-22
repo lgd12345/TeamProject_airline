@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.airline.a1.search.CardProductsFilesMapper">
+	<insert id="productFileWrite"
+		parameterType="com.airline.a1.search.CardProductsFilesVO">
+		insert into productFiles values
+		<foreach collection="list" item="item" separator=",">
+			(null, #{item.num}, #{item.fname}, #{item.oname})
+		</foreach>
+	</insert>
+
+	<select id="productFileList"
+		parameterType="java.lang.Integer"
+		resultType="com.airline.a1.search.CardProductsFilesVO">
+		select * from productFiles where num=#{num}
+	</select>
+
+	<select id="productFileSelect"
+		resultType="com.airline.a1.search.CardProductsFilesVO"
+		parameterType="com.airline.a1.search.CardProductsFilesVO">
+		select * from productFiles where fnum=#{fnum}
+	</select>
+
+	<delete id="productFileDelete"
+		parameterType="com.airline.a1.search.CardProductsFilesVO">
+		delete from productFiles where fnum = #{fnum}
+	</delete>
+
+
+
+
+</mapper>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.airline.a1.search.CardProductsMapper">
+
+	<!-- 검색 -->
+	<sql id="bs">
+		<choose>
+			<when test="kind == 'ka'">
+				where product like concat('%',#{search},'%')
+				or
+				contents
+				like concat('%',#{search},'%')
+			</when>
+			<when test="kind == 'kt'">
+				where product like concat('%',#{search},'%')
+			</when>
+			<!-- <when test="kind == 'kc'"> where contents like concat('%',#{search},'%') 
+				</when> -->
+			<otherwise>
+				where contents like concat('%', #{search},'%')
+			</otherwise>
+		</choose>
+	</sql>
+
+
+	<!-- productWrite -->
+	<insert id="productWrite"
+		parameterType="com.airline.a1.search.CardProductsBoardVO"
+		useGeneratedKeys="true" keyProperty="num">
+		insert into cardDataList
+		values(#{num}, #{cate}, #{product}, #{contents}, now(),0,
+		#{productExp}, #{fix})
+	</insert>
+
+	<!-- productList -->
+	<select id="productList"
+		resultType="com.airline.a1.search.CardProductsVO"
+		parameterType="com.airline.a1.boardUtil.Pager">
+		select *
+		from (select
+		@ROWNUM := @ROWNUM + 1 AS ROWNUM,
+		N.*
+		from
+		cardDataList N,
+		(select @ROWNUM :=#{startRow}) R
+		<include refid="bs"></include>
+		order by fix desc, num desc) K
+		limit #{startRow},10
+	</select>
+
+	<select id="subProductList"
+		resultType="com.airline.a1.search.CardProductsVO"
+		parameterType="com.airline.a1.boardUtil.Pager">
+		<!-- select * from (select @ROWNUM := @ROWNUM + 1 AS ROWNUM, N.* from notice 
+			N, (select @ROWNUM :=0) R <include refid="bs"></include> order by num desc) 
+			K where cate =#{menu} limit #{startRow}, 10 -->
+
+		select @rnum:=@rnum+1 as NO, a.*
+		from
+		(select * from cardDataList
+		<include refid="bs"></include>
+		and cardName=#{menu}
+		order by fix desc, num desc)a,
+		(select
+		@rnum:=#{startRow})b limit #{startRow},10
+	</select>
+
+	<select id="adminProductList"
+		resultType="com.airline.a1.search.CardProductsVO"
+		parameterType="com.airline.a1.search.CardProductsVO">
+		select * from cardDataList
+	</select>
+
+	<!-- Pager -->
+	<select id="productCount" resultType="java.lang.Integer"
+		parameterType="com.airline.a1.boardUtil.Pager">
+		select count(ifnull(num,0)) from cardDataList
+		<include refid="bs"></include>
+	</select>
+
+	<select id="productCount2" resultType="java.lang.Integer"
+		parameterType="com.airline.a1.boardUtil.Pager">
+		select count(ifnull(num,0)) from(select* from cardDataList
+		where
+		cardName=#{menu})N
+		<include refid="bs"></include>
+	</select>
+
+	<!-- 조회수 -->
+	<update id="productHit">
+		update cardDataList set hit = hit+1 where num=#{num}
+	</update>
+
+	<resultMap type="com.airline.a1.search.CardProductsVO"
+		id="selectResult">
+		<id column="num" property="num" />
+		<result column="product" property="product" />
+		<result column="contents" property="contents" />
+		<result column="productExp" property="productExp" />
+		<result column="regDate" property="regDate" />
+		<result column="hit" property="hit" />
+		<result column="fix" property="fix" />
+		<collection property="productFiles"
+			javaType="java.util.ArrayList"
+			ofType="com.airline.a1.search.CardProductsFilesVO">
+			<id column="fnum" property="fnum" />
+			<result column="num" property="num" />
+			<result column="fname" property="fname" />
+			<result column="oname" property="oname" />
+		</collection>
+	</resultMap>
+
+	<!-- productSelect -->
+	<select id="productSelect" resultMap="selectResult"
+		parameterType="com.airline.a1.search.CardProductsVO">
+		select N.*, F.* from cardDataList N
+		left join
+		productFiles F on N.num = F.num
+		where N.num =
+		#{num}
+		union
+
+		select N.*, F.*
+		from cardDataList N
+		right join
+		productFiles F on N.num = F.num
+		where
+		N.num =
+		#{num}
+	</select>
+
+
+	<select id="subProductSelect" resultMap="selectResult"
+		parameterType="com.airline.a1.search.CardProductsVO">
+		select N.*, F.* from cardDataList N
+		left join
+		productFiles F on N.num = F.num
+		where N.num =
+		#{num} and N.cate =
+		#{menu}
+		union
+		select N.*, F.* from
+		cardDataList N
+		right join productFiles
+		F on N.num = F.num
+		where
+		N.num = #{num} and N.cate = #{menu}
+	</select>
+
+
+	<!-- 이전글, 다음글 -->
+	<select id="prev"
+		resultType="com.airline.a1.search.CardProductsVO"
+		parameterType="com.airline.a1.search.CardProductsVO">
+					<![CDATA[select product,num from cardDataList where num < #{num} order by num desc limit 1]]>
+	</select>
+
+	<select id="next"
+		resultType="com.airline.a1.search.CardProductsVO"
+		parameterType="com.airline.a1.search.CardProductsVO">
+					<![CDATA[select product,num from cardDataList where num > #{num} order by num asc limit 1]]>
+	</select>
+
+	<!-- productsUpdate -->
+	<update id="productUpdate"
+		parameterType="com.airline.a1.search.CardProductsBoardVO">
+		update cardDataList set cate=#{cate},
+		product=#{product}, contents=#{contents}, productExp=#{productExp},
+		fix=#{fix} where num=#{num}
+	</update>
+
+
+
+	<!-- productsDelete -->
+	<delete id="productDelete"
+		parameterType="com.airline.a1.search.CardProductsBoardVO">
+		delete from cardDataList where num=#{num}
+	</delete>
+
+</mapper>

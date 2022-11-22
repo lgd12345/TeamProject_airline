@@ -1,0 +1,352 @@
+@charset "UTF-8";
+
+header {
+	height: 123px;
+}
+
+section {
+	width: 1200px;
+	margin: 0 auto;
+	margin-bottom: 100px;
+	
+}
+
+/* #muse{
+	text-align: center;
+	background-color: red;
+}
+
+.milCheck{
+	padding-left: 20px;
+}
+
+.tprice{
+	padding-left: 20px;
+} */
+
+#top {
+	height: 170px;
+	background-color: #6d6e71;
+}
+
+#topWrap {
+	width: 1200px;
+	height: 100%;
+	margin: 0 auto;
+	color: white;
+}
+
+#top1, #top2, #top3, #top4 {
+	width: 278px;
+	height: 170px;
+	float: left;
+}
+
+#noti {
+	min-height: 90px;
+	background-color: #f3f4f6;
+	padding-bottom: 22px;
+	-webkit-font-smoothing: antialiased;
+    -webkit-text-stroke: 0.45px;
+}
+
+#notiWrap {
+	width: 1200px;
+	height: 100%;
+	margin: 0 auto;
+	vertical-align: middle;
+	padding-top: 25px;
+}
+
+#title {
+	padding: 60px 0;
+	text-align: center;
+	font-weight: bolder;
+	font-size: 40px;
+}
+
+#tmsg {
+	padding: 25px 0;
+	border-top: gray solid 1px;
+	border-bottom: gray solid 1px;
+	margin-bottom: 30px;
+	-webkit-font-smoothing: antialiased;
+    -webkit-text-stroke: 0.45px;
+}
+
+/*  */
+input[type="text"]:hover, input[type="password"]:hover, input[type="email"]:hover,
+	input[type="number"]:hover {
+	border: 1px solid #d60815;
+	background-color: #fff;
+}
+
+input[type="text"], input[type="email"], input[type="password"], input[type="number"]
+	{
+	height: 44px;
+	padding: 0 15px;
+	margin-right: 10px;
+	border: 1px solid #f3f3f3;
+	border-bottom: 1px solid #ddd;
+	color: #222;
+	background-color: #f3f3f3;
+	font-size: 16px;
+	line-height: 40px;
+}
+
+input[type="checkbox"], input[type="radio"]{
+	display: none;
+}
+
+input[type="radio"] + label {
+    height: 20px;
+    padding: 0 30px;
+    background: url(/images/common/bg_radio.png) no-repeat;
+    font-size: 16px;
+    color: #222;
+    vertical-align: middle;
+    line-height: 18px;
+}
+
+input[type="radio"]:checked + label {
+    background-position: 0 -20px;
+}
+
+select:hover {
+	border: 1px solid #d60815;
+	background-color: #fff;
+}
+
+select {
+	height: 46px;
+	padding: 0 45px 0 15px;
+	margin-right: 10px;
+	border: 1px solid #f3f3f3;
+	border-bottom: 1px solid #ddd;
+	background: #f3f3f3 url('/images/common/bg_select_arrow.png') no-repeat
+		right 13px top 50%;
+	background-size: 12px 8px;
+	color: #222;
+	vertical-align: middle;
+	-webkit-appearance:none;
+}
+
+.bth {
+	padding: 25px 25px;
+	border-bottom: 1px solid #ddd;
+	background-color: #6d6e70;
+	color: #fff;
+	font-size: 16px;
+	text-align: center;
+	font-weight: normal;
+	width: 180px;
+}
+
+.btb {
+	padding: 15px 25px;
+	border-bottom: 1px solid #ddd;
+	border-top: 1px solid #ddd;
+}
+
+/* checkbox */
+input[type="checkbox"]:checked + label {
+    background: url(/images/common/bg_checkbox_check.png) no-repeat;
+}
+
+input[type="checkbox"] + label {
+    min-height: 20px;
+    padding: 0 40px 0 30px;
+    background: url(/images/common/bg_checkbox_default.png) no-repeat;
+    font-size: 16px;
+    color: #222;
+    vertical-align: middle;
+    line-height: 18px;
+}
+/* checkbox 끝  */
+
+
+#btn {
+	cursor: pointer;
+	width: 110px;
+	height: 50px;
+	background-color: #d60815;
+	border: none;
+	color: white;
+	padding: 15px 32px;
+	text-align: center;
+	text-decoration: none;
+	font-size: 16px;
+	position: relative;
+    left: 1078px;
+}
+
+.gray_box {
+	cursor:default;
+    position: relative;
+    margin-top: 80px;
+    padding: 40px;
+    background-color: #f7f7f7;
+}
+
+.gray_box h5 {
+    margin-bottom: 15px;
+    font-size: 23px;
+    font-weight: normal;
+    color: #000;
+}
+
+.gray_box .list_type2 > li {
+    color: #444;
+    font-size: 15px;
+    cursor:default;
+}
+
+.list_type2 > li {
+    padding-left: 13px;
+    text-indent: -13px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: normal;
+    color: #222;
+    text-align: left;
+    cursor:default;
+}
+
+.gray_box .list_type2 > li:before {
+    width: 3px;
+    height: 3px;
+    cursor:default;
+}
+
+.list_type2 > li:before {
+    display: inline-block;
+    content: '';
+    margin: -4px 10px 0 0;
+    width: 2px;
+    height: 2px;
+    background: #555;
+    vertical-align: middle;
+    cursor:default;
+}
+
+/* 회원번호 찾기  */
+
+.mbtn{
+	cursor: pointer;
+	width: 110px;
+	height: 44px;
+	background-color: #d60815;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	font-size: 16px;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 8% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 38%; /* Could be more or less, depending on screen size */
+  height: 360px;
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+/* 모달 안 */
+#mtitle {
+    padding: 10px 0;
+    text-align: center;
+    font-weight: bolder;
+    font-size: 40px;
+    margin-bottom: 23px;
+}
+
+.mbth {
+	padding: 25px 25px;
+	border-bottom: 1px solid #ddd;
+	background-color: #6d6e70;
+	color: #fff;
+	font-size: 16px;
+	text-align: center;
+	font-weight: normal;
+	width: 180px;
+}
+
+.mbtb {
+	padding: 15px 25px;
+	border-bottom: 1px solid #ddd;
+	border-top: 1px solid #ddd;
+}
+
+.mbtn2{
+	cursor: pointer;
+	width: 110px;
+	height: 44px;
+	background-color: #d60815;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	font-size: 16px;
+}
+
+#modalfm{
+display: block;
+    width: 686px;
+    height: 127px;
+    background-color: #f3f3f3;
+    margin: 0 auto;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 102px;
+}
+
+#ubtn{
+cursor: pointer;
+    width: 82px;
+    height: 28px;
+    background-color: gray;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    display: none;
+    margin: 0 auto;
+    margin-top: -46px;
+	
+}

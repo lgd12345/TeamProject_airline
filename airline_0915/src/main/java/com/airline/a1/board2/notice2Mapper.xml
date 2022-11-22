@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.airline.a1.board2.Notice2Mapper">
+
+
+
+		<!-- 검색 -->
+		<sql id="bs">
+					<choose>
+						<when test="kind == 'ka'">
+							where title like concat('%',#{search},'%')
+							or textContents like concat('%',#{search},'%')  
+						</when>
+						<when test="kind == 'kt'">
+							where title like concat('%',#{search},'%')
+						</when>
+						<!-- <when test="kind == 'kc'">
+							where contents like concat('%',#{search},'%')
+						</when> -->
+						<when test="kind == 'ku'">
+							where writer like concat('%',#{search},'%')
+						</when>
+					<otherwise>
+							where textContents like concat('%', #{search},'%')
+						</otherwise>
+					</choose>
+			</sql>
+			
+			
+			
+			
+		<!-- noticeWrite -->
+		<insert id="notice2Write" parameterType="com.airline.a1.board2.Board2VO" useGeneratedKeys="true" keyProperty="num">	
+				insert into board_r
+				values(#{num}, #{cate},#{title}, #{writer}, #{contents}, now(),0, #{textContents}, #{fix})
+		</insert>
+		
+		<!-- noticeWrite1 -->
+		<insert id="notice2Write1" parameterType="com.airline.a1.board2.Board2VO" useGeneratedKeys="true" keyProperty="num">	
+				insert into board_r
+				values(#{num}, #{cate},#{title}, #{writer}, #{contents}, now(),0, #{textContents}, #{fix})
+		</insert>
+		
+
+
+
+
+		<!-- noticeList -->
+		<select id="notice2List" resultType="com.airline.a1.board2.Notice2VO" parameterType="com.airline.a1.board2Util.Pager2">			
+				 select * 
+						from (select
+									@ROWNUM := @ROWNUM + 1 AS ROWNUM, 
+									N.*
+							 	from board_r N,
+							 		(select @ROWNUM :=#{startRow}) R
+							 	<include refid="bs"></include>
+							 	order by fix desc, num desc) K
+					 limit #{startRow},10
+		</select>
+
+<!-- 여기가 관리자 리스트  -->
+		<select id="subNotice2List" resultType="com.airline.a1.board2.Notice2VO" parameterType="com.airline.a1.board2Util.Pager2">
+				  <!-- select * 
+							from (select
+										@ROWNUM := @ROWNUM + 1 AS ROWNUM, 
+										N.*
+								 	from notice N,
+								 		(select @ROWNUM :=0) R
+								 	<include refid="bs"></include>
+								 	order by num desc) K
+								 	where cate =#{menu}
+								 limit #{startRow}, 10  -->
+								 
+					select @rnum:=@rnum+1 as NO, a.*
+				   		from
+				    		(select * from board_r 
+								<include refid="bs"></include> and cate=#{menu}
+							 order by fix desc, num desc)a, 
+				   		 (select @rnum:=#{startRow})b limit #{startRow},10				 			
+		</select>
+		<select id="adminNotice2List" resultType="com.airline.a1.board2.Notice2VO" parameterType="com.airline.a1.board2.Notice2VO">
+				select * from board_r
+		</select>
+
+
+
+		<!-- Pager -->
+		<select id="notice2Count" resultType="java.lang.Integer" parameterType="com.airline.a1.board2Util.Pager2">
+				select count(ifnull(num,0)) from board_r
+					<include refid="bs"></include>
+		</select>
+
+		<select id="notice2Count2" resultType="java.lang.Integer" parameterType="com.airline.a1.board2Util.Pager2">				
+					select count(ifnull(num,0)) from(select* from board_r where cate=#{menu})N 
+					<include refid="bs"></include>	
+		</select>
+
+
+		<!-- 조회수 -->
+		<update id="notice2Hit">
+			update board_r set hit = hit+1 where num=#{num}
+		</update>
+
+
+
+			<resultMap type="com.airline.a1.board2.Notice2VO" id="selectResult">
+				<id column="num" property="num"/>
+				<result column="cate" property="cate"/>
+				<result column="title" property="title"/>
+				<result column="writer" property="writer"/>
+				<result column="contents" property="contents"/>
+				<result column="textContents" property="textContents"/>
+				<result column="regDate" property="regDate"/>
+				<result column="hit" property="hit"/>
+				<result column="fix" property="fix"/>
+				<collection property="notice2Files" javaType="java.util.ArrayList" ofType="com.airline.a1.board2.Notice2FilesVO">
+					<id column="fnum" property="fnum"/>
+					<result column="num" property="num"/>
+					<result column="fname" property="fname"/>
+					<result column="oname" property="oname"/>
+				</collection>
+			</resultMap>
+			
+			
+			
+			<!-- noticeSelect -->
+			<select id="notice2Select" resultMap="selectResult" parameterType="com.airline.a1.board2.Notice2VO">
+					   select N.*, F.* from board_r N 
+							left join board_r_Files F	on N.num = F.num
+							where N.num = #{num}
+						union 
+						
+			     	   select N.*, F.* from board_r N 
+							right join board_r_Files F on N.num = F.num          
+						where N.num = #{num}
+			</select>
+			
+				<!-- noticeSelect1 -->
+			<select id="notice2Select1" resultMap="selectResult" parameterType="com.airline.a1.board2.Notice2VO">
+					   select N.*, F.* from board_r N 
+							left join board_r_Files F	on N.num = F.num
+							where N.num = #{num}
+						union 
+						
+			     	   select N.*, F.* from board_r N 
+							right join board_r_Files F on N.num = F.num          
+						where N.num = #{num}
+			</select>
+			
+
+			<select id="subNotice2Select" resultMap="selectResult" parameterType="com.airline.a1.board2.Notice2VO">
+					   select N.*, F.* from board_r N 
+							left join board_r_Files F	on N.num = F.num
+							where N.num = #{num} and N.cate = #{menu}
+						union 
+			     	   select N.*, F.* from board_r N 
+							right join board_r_Files F on N.num = F.num          
+						where N.num = #{num} and N.cate = #{menu}
+			</select>
+
+
+			<!-- 이전글, 다음글 -->
+			<select id="prev" resultType="com.airline.a1.board2.Notice2VO" parameterType="com.airline.a1.board2.Notice2VO">
+					<![CDATA[select title,num from board_r where num < #{num} order by num desc limit 1]]>	
+			</select>
+			
+			<select id="next" resultType="com.airline.a1.board2.Notice2VO" parameterType="com.airline.a1.board2.Notice2VO">
+					<![CDATA[select title,num from board_r where num > #{num} order by num asc limit 1]]>	
+			</select>
+
+			<!-- <select id="listView" resultType="com.airline.a1.board.BoardVO" parameterType="com.airline.a1.board.NoticeVO">
+				<![CDATA[select title,num from notice where num in(
+					(select num from notice where num < #{num} order by num desc limit 1),
+	                (select num from notice where num > #{num} order by num  limit 1)
+	            )]]>	
+			</select> -->
+
+
+
+		
+			<!-- noticeUpdate -->
+			<update id="notice2Update" parameterType="com.airline.a1.board2.Board2VO">
+				update board_r set cate=#{cate},title=#{title}, contents=#{contents}, textContents=#{textContents}, fix=#{fix} where num=#{num}
+			</update>
+			
+			<!-- noticeUpdate1 -->
+			<update id="notice2Update1" parameterType="com.airline.a1.board2.Board2VO">
+				update board_r set cate=#{cate},title=#{title}, contents=#{contents}, textContents=#{textContents}, fix=#{fix} where num=#{num}
+			</update>
+		
+		
+		
+			<!-- noticeDelete -->
+			<delete id="notice2Delete" parameterType="com.airline.a1.board2.Board2VO">
+				delete from board_r where num=#{num}
+			</delete>
+			
+		
+</mapper>	

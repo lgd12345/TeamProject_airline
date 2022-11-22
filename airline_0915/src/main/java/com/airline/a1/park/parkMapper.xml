@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.airline.a1.park.parkMapper">
+  	<select id="parkCheck" parameterType="com.airline.a1.park.pReservationVO" resultType="com.airline.a1.park.pReservationVO">
+  		select P.* from (select * from pReservation where airport = #{airport}) P where 
+  		#{startDate} between startDate and endDate
+  		or  #{endDate} between startDate and endDate
+  		or <![CDATA[startDate >= #{startDate} and endDate <=#{endDate}]]>
+  		
+  	</select>
+  	
+  	<select id="parkWhere" parameterType="com.airline.a1.park.pInfoVO" resultType="com.airline.a1.park.pInfoVO">
+  		select * from pInfo where
+  		aName = #{aName}
+  	</select>
+  	
+  	<insert id="resInsert" parameterType="com.airline.a1.park.pReservationVO">
+  		insert into pReservation values (0, #{carNum}, curdate(), #{rate}, #{id},
+  		 #{startDate}, #{endDate}, #{areaNum}, #{airport}, #{phone}, #{password})
+  	</insert>
+  	
+  	<select id="myReservation" parameterType="com.airline.a1.park.pReservationVO" resultType="com.airline.a1.park.pReservationVO">
+  		select P.* from (select * from pReservation where id = #{id}) P where
+  		startDate between #{startDate} and #{endDate}
+  		or  endDate between #{startDate} and #{endDate}
+  	</select>
+  	
+  	<select id="resSelect" parameterType="com.airline.a1.park.pReservationVO" resultType="com.airline.a1.park.pReservationVO">
+  		select * from pReservation where pResNum = #{pResNum}
+  	</select>
+  	
+  	<delete id="parkCancel" parameterType="com.airline.a1.park.pReservationVO">
+  		delete from pReservation where pResNum = #{pResNum}
+  	</delete>
+  	
+  	<delete id="parkCancel2" parameterType="com.airline.a1.park.pReservationVO">
+  		delete from pReservation where pResNum = #{pResNum} and password = #{password}
+  	</delete>
+  	
+  	<select id="FindMyResByCarNum" parameterType="com.airline.a1.park.pReservationVO" resultType="com.airline.a1.park.pReservationVO" >
+  		select * from pReservation where carNum = #{carNum} and password = #{password}
+  	</select>
+  	
+  	<select id="FindMyResByPhone" parameterType="com.airline.a1.park.pReservationVO" resultType="com.airline.a1.park.pReservationVO" >
+  		select * from pReservation where phone = #{carNum} and password = #{password}
+  	</select>
+  	
+  	<!-- 공항별 지난 달 수익 -->
+  	<select id="lastMonthEarn" parameterType="java.lang.String" resultType="com.airline.a1.park.pReservationVO">
+  		select airport, sum(rate) rate from airline.pReservation where endDate like CONCAT(#{pm}, '%') group by airport order by airport asc
+  	</select>
+  	
+  	<!-- 공항별 이번 달 예상 수익 -->
+  	<select id="thisMonthEarn" parameterType="java.lang.String" resultType="com.airline.a1.park.pReservationVO">
+  		select airport, sum(rate) rate from airline.pReservation where endDate like CONCAT(#{tm}, '%') group by airport order by airport asc
+  	</select>
+  	
+  	<select id="today" resultType="com.airline.a1.park.pReservationVO">
+  		select airport, count(rate) areaNum from airline.pReservation 
+		where date(now()) between startDate and endDate group by airport order by airport asc
+  	</select>
+  	
+  	<select id="parkInfo" resultType="com.airline.a1.park.pInfoVO">
+  		select * from pInfo order by aName asc
+  	</select>
+  	
+  	<select id="parkOut" resultType="com.airline.a1.park.pReservationVO">
+  		select A.airport, count(B.pResNum) areaNum from  
+		(select distinct airport from pReservation) A
+		left outer join
+		(select * from airline.pReservation where date(now()) = endDate) B
+		on A.airport = B.airport
+		group by A.airport order by airport asc
+  	</select>
+  	
+  	<select id="parkIn" resultType="com.airline.a1.park.pReservationVO">
+  		select A.airport, count(B.pResNum) areaNum from  
+		(select distinct airport from pReservation) A
+		left outer join
+		(select * from airline.pReservation where date(now()) = startDate) B
+		on A.airport = B.airport
+		group by A.airport order by airport asc
+  	</select>
+  	
+  	
+  	<select id="parkfinalcheck" parameterType="com.airline.a1.park.pReservationVO" resultType="com.airline.a1.park.pReservationVO">
+  		select P.* from (select * from pReservation where airport = #{airport} and areaNum=#{areaNum}) P where 
+  		#{startDate} between startDate and endDate
+  		or  #{endDate} between startDate and endDate
+  		or <![CDATA[startDate >= #{startDate} and endDate <=#{endDate}]]>
+  	</select>
+  </mapper>
