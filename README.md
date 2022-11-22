@@ -8,11 +8,11 @@
 
 🚩 
 + mysql 사용했다. 
- <p>파일을 실행하면 schema와 table은 만들어진다.
- <p>application.properties에서 
- <p>spring.datasource.username=
- <p>spring.datasource.password=
- <p>를 작성한다.
+   <p>파일을 실행하면 schema와 table은 만들어진다.
+   <p>application.properties에서 
+   <p>spring.datasource.username=
+   <p>spring.datasource.password=
+   <p>를 작성한다.
  
 + Lombok을 사용했다. 설치 필요
 
